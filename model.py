@@ -1,3 +1,4 @@
+
 """
 This module defines the data model for the simulation. Specifically, it provides a class for representing patches of the simulation grid and a class for representing cells that inhabit these patches.
 
@@ -18,6 +19,7 @@ This module provided as material for Phase 1 of the exam project for DM562, DM85
 
 from __future__ import annotations # to use a class in type hints of its members
 from typing import Optional
+import numpy as np
 
 class BasePatch:
   """Represents a 'patch' at the intersection of the riven row and column of the simulation grid."""
@@ -34,7 +36,7 @@ class BasePatch:
 
   def can_host_cell(self:CellPatch)->bool:
     """Returns whether this patch can be inhabited by cells."""
-
+    #is this needed??
 
   def col(self:BasePatch)->int:
     """Returns the index of the column containing this patch."""
@@ -47,7 +49,7 @@ class BasePatch:
 class Cell:
   """Represents a cell in the simulation."""
 
-  def __init__(patch:CellPatch,resistance:int,parent:Optional[Cell]=None):
+  def __init__(self:Cell,patch:CellPatch,resistance:int,parent:Optional[Cell]=None):
     """    
     Parameters
     ----------
@@ -56,9 +58,12 @@ class Cell:
     """
     self._patch = patch
     self._age = 0
+    self._divisions_probability = 0.6 * (resistance/20)
     self._divisions = 0
     self._last_division = 0
     self._alive = True
+    self._resistance = 0
+    self._generation = 0
     # inform patch that this cell is on it
     patch.put_cell(self)
   
@@ -68,12 +73,27 @@ class Cell:
 
   def died_by_age_limit(self:Cell)->bool:
     """Checks if this cell died because it exceeded the age limit."""
+
+    assert self.is_alive(), "the cell must be alive."
+    self._alive = False
+    # removes the cell from this cell's patch
+    self._patch.remove_cell()
   
   def died_by_division_limit(self:Cell)->bool:
     """Checks if this cell died because it exceeded the division limit."""
 
+    assert self.is_alive(), "the cell must be alive."
+    self._alive = False
+    # removes the cell from this cell's patch
+    self._patch.remove_cell()
+
   def died_by_poisoning(self:Cell)->bool:
     """Checks if this cell died because of the toxicity in its patch."""
+
+    assert self.is_alive(), "the cell must be alive."
+    self._alive = False
+    # removes the cell from this cell's patch
+    self._patch.remove_cell()
 
   def divide(self:Cell,patch:CellPatch)->bool:
     """This cell attempts to divide using the given patch for the new cell. Returns True if the division is successful, False otherwise.
@@ -82,7 +102,7 @@ class Cell:
     assert self.is_alive(), "the cell must be alive."
     self._last_division = 0 # reset the counter from the last division
     self._divisions = self._divisions + 1 # updates the division count
-    return Cell(patch)
+    return Cell(patch, np.random.choice(9))
 
   def divisions(self:Cell)->int:
     """Returns number of division performed by this cell."""
@@ -90,6 +110,7 @@ class Cell:
 
   def generation(self:Cell)->int:
     """Returns the generation of this cell (generations are counted starting from 0)."""
+    return self._generation
   
   def is_alive(self:Cell)->bool:
     """Returns whether this cell is alive."""
@@ -97,13 +118,15 @@ class Cell:
   
   def parent(self:Cell)->Optional[Cell]:
     """Returns the parent of this cell, None this cell belongs to the initial generation."""
+    #how??
 
-  def patch(self:Cell)->Patch:
+  def patch(self:Cell)->CellPatch:
     """Returns the patch of this cell. If the cell is dead, it returns the patch where the cell died."""
     return self._patch
 
   def resistance(self:Cell)->int:
     """Returns the resistance level of this cell."""
+    return self._resistance
 
   def tick(self:Cell)->None:
     """Register with this cell that a tick in the simulation happened making the cell age.
@@ -113,9 +136,9 @@ class Cell:
     self._age = self._age + 1
     self._last_division = self._last_division + 1
 
-class CellPatch:
+class CellPatch(BasePatch):
 
-  def __init__(row:int,col:int,toxicity:int):
+  def __init__(self:CellPatch, row:int,col:int,toxicity:int):
     """
     Parameters
     row, col : int
@@ -124,16 +147,21 @@ class CellPatch:
     toxicity : int
  
     The level of toxicity found in this patch."""
+
+    self._col = col
+    self._row = row
+    self._cell : Optional[Cell] = None
+    self._toxicity = 0
   
   def cell(self:BasePatch)->Optional[Cell]:
     """Returns the cell currently on this patch, if any."""
     return self._cell
 
-  def has_cell(self:Patch)->bool:
+  def has_cell(self:BasePatch)->bool:
     """Checks if the patch holds a cell."""
     return self._cell is not None
 
-  def put_cell(self:Patch,cell:Cell)->None:
+  def put_cell(self:BasePatch,cell:Cell)->None:
     """Puts a cell on this patch.
     
     Preconditions: there is no cell on this patch and the cell is not on another patch
@@ -142,19 +170,28 @@ class CellPatch:
     assert cell.patch() is self, "The cell is on another patch."
     self._cell = cell
 
-  def remove_cell(self:Patch)->None:
+  def remove_cell(self:BasePatch)->None:
     """Removes any cell currently on this patch."""
     self._cell = None
 
   def toxicity(self:CellPatch)->bool:
     """Returns the toxicity level of this patch."""
+    return self._toxicity
 
   def __repr__(self:BasePatch)->str:
     """Returns a string representation of this patch."""
     return f"Patch({self.row()}, {self.col()})"
 
-class ObstaclePatch:
+class ObstaclePatch(BasePatch):
   
   def __init__(self:ObstaclePatch,row:int,col:int):
     self._row = row
     self._col = col
+
+  def col(self:ObstaclePatch)->int:
+    """Returns the index of the column containing this patch."""
+    return self._col
+
+  def row(self:ObstaclePatch)->int:
+    """Returns the index of the row containing this patch."""
+    return self._row

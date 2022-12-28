@@ -20,6 +20,8 @@ This module provided as material for Phase 1 of the exam project for DM562, DM85
 from __future__ import annotations # to use a class in type hints of its members
 from typing import Optional
 import numpy as np
+import random
+from random import shuffle, choices, choice
 
 class BasePatch:
   """Represents a 'patch' at the intersection of the riven row and column of the simulation grid."""
@@ -58,11 +60,11 @@ class Cell:
     """
     self._patch = patch
     self._age = 0
-    self._divisions_probability = 0.6 * (resistance/20)
+    self._divisions_probability = 0.6
     self._divisions = 0
     self._last_division = 0
     self._alive = True
-    self._resistance = 0
+    self._resistance = resistance
     self._generation = 0
     # inform patch that this cell is on it
     patch.put_cell(self)
@@ -102,7 +104,7 @@ class Cell:
     assert self.is_alive(), "the cell must be alive."
     self._last_division = 0 # reset the counter from the last division
     self._divisions = self._divisions + 1 # updates the division count
-    return Cell(patch, np.random.choice(9))
+    return Cell(patch,random.randrange(10))
 
   def divisions(self:Cell)->int:
     """Returns number of division performed by this cell."""
@@ -151,7 +153,7 @@ class CellPatch(BasePatch):
     self._col = col
     self._row = row
     self._cell : Optional[Cell] = None
-    self._toxicity = 0
+    self._toxicity = toxicity
   
   def cell(self:BasePatch)->Optional[Cell]:
     """Returns the cell currently on this patch, if any."""

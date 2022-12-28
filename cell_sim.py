@@ -10,12 +10,17 @@ import numpy as np
 def cell_life(cell:Cell,age_limit,division_limit):
     '''Uses tick function to age cells. if the age_limit or division_limit is exceeded, the cell will die.'''
     cell.tick()
-    #if cell.age() > age_limit:
-        #cell.die()
-       # age_deaths.append(cell)
-   #elif cell.divisions() > division_limit:
-        #cell.die()
+    if cell.age() > age_limit:
+        cell.patch().remove_cell()
+        #age_deaths.append(cell)
+    elif cell.divisions() > division_limit:
+        cell.patch().remove_cell()
        # division_deaths.append(cell)
+    else:
+        if cell.patch().toxicity() - cell.resistance() >= random.randint(0,10):
+            cell.patch().remove_cell()
+
+    
 
 def check_for_cells(patch_list):
     '''Iterates over the entire patch list for cells. Returns true if there is a cell on the patch.'''
@@ -33,12 +38,11 @@ def create_board(row:int, col:int, grid:np.array):
                 obstacle_patch = ObstaclePatch(i, j)
                 patch_list.append(obstacle_patch)
             else:
-                toxic = type(int(grid[i][j]))
+                toxic = int(grid[i][j])
+                print(int(grid[i][j]))
                 cell_patch = CellPatch(i, j,toxic)
                 patch_list.append(cell_patch)
     return patch_list
-
-#def init_population(row,col,initial_population):
 
 def free_neighbors(patches, patch, row:int, col:int):
     '''Checks neighboring patches of each cell for vacant patches. Returns false with a list of vacant patches, if there are, true if not.'''
@@ -61,9 +65,8 @@ def spread_cells(patches,patch,row,col,divisions_probability,cd):
     if not, the random function runs and a cell divides if it is succesful and has no cooldown period.'''
     (x,y) = (patch.row(),patch.col())
     overcrowd, poss = free_neighbors(patches, patch, row, col)
-    if (divisions_probability * patch.cell().resistance()/20) <= random.random() and poss:
+    if (divisions_probability - patch.cell().resistance()/20) <= random.random() and poss:
             x_r, y_r = choice(poss)
-            print(poss)
             cell = patch.cell()
             if cell.divisions() <= cd:
                 #cell_list.append(cell)
@@ -77,16 +80,14 @@ def initial_pop(row:int,col:int,intial_population:int,grid):
     cellpatches = list(filter(lambda x: isinstance(x, CellPatch), board))
     for patches in cellpatches:
         if init_pop[0] == 1:
-            Cell(patches,np.random.choice(9))
-            #print(test)
+            Cell(patches,random.randrange(10))
         init_pop = init_pop[1:]
     return board, cellpatches
 
 if __name__ == '__main__':
-    grid = np.genfromtxt('grid_1.txt', dtype='str')
+    grid = np.genfromtxt('grid_3.txt', dtype='str')
     row = len(grid)
     col = len(grid[0])
-    #create_board(test)
     initial_population = 2
     age_limit = 10
     division_limit = 7
@@ -97,7 +98,6 @@ if __name__ == '__main__':
     tick = 0
     init_pop,cell_patches = initial_pop(row,col,initial_population,grid)
     vis = Visualiser(init_pop,row,col)
-    print(vis._patches)
     while check_for_cells(cell_patches) and tick<time_limit:
         for patch in cell_patches:
             if patch.has_cell():
@@ -108,8 +108,6 @@ if __name__ == '__main__':
                 spread_cells(vis._patches,patch,row,col,division_prob,division_cd)
         vis.update()
         tick += 1
-        #print(tick)
-    
-    print('12312')
+
     
 

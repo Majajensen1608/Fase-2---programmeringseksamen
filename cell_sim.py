@@ -20,8 +20,6 @@ def cell_life(cell:Cell,age_limit,division_limit):
         if cell.patch().toxicity() - cell.resistance() >= random.randint(0,10):
             cell.patch().remove_cell()
 
-    
-
 def check_for_cells(patch_list):
     '''Iterates over the entire patch list for cells. Returns true if there is a cell on the patch.'''
     for patch in patch_list:
@@ -60,17 +58,24 @@ def free_neighbors(patches, patch, row:int, col:int):
                 if_vacants.append((a,b))
     return (False,if_vacants) if len(if_vacants)>0 else (True,if_vacants)
 
+def rand(prob):
+    result = choices([1,0],[prob,1-prob],k=1)[0]
+    if result == 1:
+        return True
+    else:
+        return False
+
 def spread_cells(patches,patch,row,col,divisions_probability,cd):
     '''Function for cell division. If the square is overcrowded a random cell from that square dies,
     if not, the random function runs and a cell divides if it is succesful and has no cooldown period.'''
     (x,y) = (patch.row(),patch.col())
     overcrowd, poss = free_neighbors(patches, patch, row, col)
     if (divisions_probability - patch.cell().resistance()/20) <= random.random() and poss:
+        if rand(divisions_probability):
             x_r, y_r = choice(poss)
             cell = patch.cell()
             if cell.divisions() <= cd:
                 #cell_list.append(cell)
-                #print(len(cell_list))
                 cell.divide(patches[x_r][y_r])
 
 def initial_pop(row:int,col:int,intial_population:int,grid):
@@ -94,7 +99,6 @@ if __name__ == '__main__':
     division_prob = 0.6
     division_cd = 1
     time_limit = 100
-    #patch_list = create_board(row,col,test)
     tick = 0
     init_pop,cell_patches = initial_pop(row,col,initial_population,grid)
     vis = Visualiser(init_pop,row,col)
@@ -110,4 +114,3 @@ if __name__ == '__main__':
         tick += 1
 
     
-

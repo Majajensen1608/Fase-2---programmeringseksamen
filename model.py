@@ -104,7 +104,7 @@ class Cell:
     assert self.is_alive(), "the cell must be alive."
     self._last_division = 0 # reset the counter from the last division
     self._divisions = self._divisions + 1 # updates the division count
-    return Cell(patch,(self._resistance + res for res in random.randint(-2,2) if 0 <= self.__resistance + res <= 9))
+    return Cell(patch,random.randrange(10))
 
   def divisions(self:Cell)->int:
     """Returns number of division performed by this cell."""

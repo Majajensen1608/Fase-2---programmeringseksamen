@@ -1,7 +1,6 @@
 from visualiser import Visualiser
 from model import CellPatch
 from model import ObstaclePatch
-from model import BasePatch
 from model import Cell
 import random
 from random import shuffle, choices, choice
@@ -12,10 +11,8 @@ def cell_life(cell:Cell,age_limit,division_limit):
     cell.tick()
     if cell.age() > age_limit:
         cell.patch().remove_cell()
-        #age_deaths.append(cell)
     elif cell.divisions() > division_limit:
         cell.patch().remove_cell()
-       # division_deaths.append(cell)
     else:
         if cell.patch().toxicity() - cell.resistance() >= random.randint(0,10):
             cell.patch().remove_cell()
@@ -27,7 +24,6 @@ def check_for_cells(patch_list):
             return True
     return False
 
-
 def create_board(row:int, col:int, grid:np.array):
     patch_list = []
     for i in range(row):
@@ -37,7 +33,6 @@ def create_board(row:int, col:int, grid:np.array):
                 patch_list.append(obstacle_patch)
             else:
                 toxic = int(grid[i][j])
-                print(int(grid[i][j]))
                 cell_patch = CellPatch(i, j,toxic)
                 patch_list.append(cell_patch)
     return patch_list
@@ -75,7 +70,6 @@ def spread_cells(patches,patch,row,col,divisions_probability,cd):
             x_r, y_r = choice(poss)
             cell = patch.cell()
             if cell.divisions() <= cd:
-                #cell_list.append(cell)
                 cell.divide(patches[x_r][y_r])
 
 def initial_pop(row:int,col:int,intial_population:int,grid):
@@ -112,5 +106,3 @@ if __name__ == '__main__':
                 spread_cells(vis._patches,patch,row,col,division_prob,division_cd)
         vis.update()
         tick += 1
-
-    

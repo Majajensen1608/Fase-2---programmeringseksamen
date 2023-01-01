@@ -183,6 +183,8 @@ if __name__ == '__main__':
         vis.update()
         tick += 1
 
+    vis.close()
+
     sorted_by_gen = sorted(gen_res_list,key=itemgetter(0))
 
     cell_gen = []

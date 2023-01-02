@@ -7,7 +7,6 @@ from msilib.schema import SelfReg
 def start_menu():
     ''' Prints a menu for the user'''
     print('*******MAIN MENU - CELLULAR AUTOMATA 2.0******')
-    time.sleep(1) 
     print('''Please select one of the following options:  
     [1] Display configuration
     [2] Setup
@@ -18,7 +17,6 @@ def start_menu():
 def option_one():  #skal der eventuelt indsættes mere her med de nye ændringer i programmet
     ''' Displays the current configurations of the simulation - with the values the user can choose'''
     print('Displaying configuration...')
-    time.sleep(1)
     print ('Row size:\t\t', current_row)
     print('Column size\t\t', current_col) 
     print('Initial population:\t', current_initial_population)
@@ -39,7 +37,6 @@ def option_reset_to_default():
 
 def user_setup():
     '''Lets the user determine the initial population and time limit (in ticks)'''
-    time.sleep(1)   
     while True: 
         value_ip = input('Insert the initial population size: ')
         global current_row
@@ -52,11 +49,9 @@ def user_setup():
                 break
             
             else:
-                time.sleep(1)
                 print ('The initial population size must be larger than 0, try again! ')
 
         except ValueError:
-            time.sleep(1)
             print ('The initial population size must be an integer larger than 0, try again!')
    
     while True:
@@ -81,7 +76,6 @@ def start_of_program():
             ans = int(ans_input)
             if ans == 1:
                 option_one()
-                time.sleep(1)
                 start_of_program()
                 break
             
@@ -89,14 +83,12 @@ def start_of_program():
                 print('Initiating  setup, please stand by...')
                 user_setup()
                 print('Returning to the main menu...')
-                time.sleep(1)
                 start_of_program()
                 break
 
             elif ans == 3:
                 print('Resetting setup to default...')
                 option_reset_to_default()
-                time.sleep(1)
                 start_of_program()
                 break           
             
@@ -107,7 +99,6 @@ def start_of_program():
             elif ans == 5:
                 print('Exiting program...')
                 print ('Thank you for using Cellular Automata 2.0!')
-                time.sleep(2)
                 sys.exit()
                 break
             

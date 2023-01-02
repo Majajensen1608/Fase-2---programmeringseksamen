@@ -118,7 +118,6 @@ if __name__ == '__main__':
     time_limit = 100
     tick = 0
     total_gens = 0
-    gen_list = []
     gen_res_list = []
     cell_list = []
     init_pop,cell_patches = initial_pop(row,col,initial_population,grid)
@@ -137,9 +136,8 @@ if __name__ == '__main__':
                 cell = patch.cell()
                 if cell not in cell_list:
                     cell_list.append(cell)
-                    gen_list.append(cell.generation())
                     gen_res_list.append((cell.generation(),cell.resistance()))
-                if total_gens <= cell.generation():
+                if total_gens < cell.generation():
                     total_gens = cell.generation() + 1 #Gen 0 still counts as 1
 
         
@@ -157,28 +155,17 @@ if __name__ == '__main__':
     if len(sorted_by_gen) != 0:
         cell_gen, cell_res = zip(*sorted_by_gen)#create two lists from sorted
 
-    #Create list with number of cells in each generation in sorted order
-    gen_counted = []
-    gen_spread = []
-    for i in cell_gen:
-        if i not in gen_counted:
-            gen_spread.append(cell_gen.count(i))
-            gen_counted.append(i)
+  
+    highest_gen = find_max(cell_gen)
+
     
-    highest_gen = find_max(gen_list)
-            
+    if len(cell_res)!=0:
+        total_res_mean = round(mean(cell_res),2)
+    else:
+        total_res_mean = 0
+
     total_deaths = age_deaths + division_deaths + poison_deaths
 
-
-    #Avg resistance total
-    avg_res_total = 0
-    if len(gen_res_list)!=0:
-        res_sum = 0
-        for cells in gen_res_list:
-            cell_res = cells[1]
-            res_sum += cell_res
-        avg_res_total = res_sum/len(gen_res_list)
-    
     
     print("")
     print("--- SIM STATS ---")
@@ -189,7 +176,7 @@ if __name__ == '__main__':
     print("")
     print("Generation with most cells:", highest_gen)
     print("")
-    print("Average resistance of all cells:",round(avg_res_total,2))
+    print("Average resistance of all cells:",total_res_mean)
     print("")
     print("Total number of cells:", total_cells + initial_population)
     print("")
@@ -202,6 +189,14 @@ if __name__ == '__main__':
     print("Total deaths:", total_deaths)
     print("")
 
+
+    #Create list with number of cells in each generation in sorted order
+    gen_counted = []
+    gen_spread = []
+    for i in cell_gen:
+        if i not in gen_counted:
+            gen_spread.append(cell_gen.count(i))
+            gen_counted.append(i)
 
     #Find the max, min and avg res for each gen and add to lists for graphs
     cell_res_max = []

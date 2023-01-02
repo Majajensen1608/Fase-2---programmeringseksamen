@@ -33,7 +33,6 @@ def cell_life(cell:Cell,age_limit,division_limit):
         global division_deaths
         division_deaths += 1
         current_cells -= 1
-    
     elif cell.patch().toxicity() - cell.resistance() >= random.randint(0,10):
         cell.died_by_poisoning()
         global poison_deaths
@@ -76,30 +75,22 @@ def free_neighbors(patches, patch, row:int, col:int):
                 if_vacants.append((a,b))
     return (False,if_vacants) if len(if_vacants)>0 else (True,if_vacants)
 
-def rand(prob):
-    result = choices([1,0],[prob,1-prob],k=1)[0]
-    if result == 1:
-        return True
-    else:
-        return False
-
 def spread_cells(patches,patch,row,col,divisions_probability,cd):
     '''Function for cell division. If the square is overcrowded a random cell from that square dies,
     if not, the random function runs and a cell divides if it is succesful and has no cooldown period.'''
     (x,y) = (patch.row(),patch.col())
-    overcrowd, poss = free_neighbors(patches, patch, row, col)
+    oc, poss = free_neighbors(patches, patch, row, col)
     if (divisions_probability - patch.cell().resistance()/20) <= random.random() and poss:
-        if rand(divisions_probability):
-            x_r, y_r = choice(poss)
-            cell = patch.cell()
-            if cell._last_division >= cd:
-                cell.divide(patches[x_r][y_r])
-                global total_cells
-                total_cells += 1
-                global current_cells
-                current_cells += 1
-                global div_list
-                div_list.append(cell.divisions())
+        x_r, y_r = choice(poss)
+        cell = patch.cell()
+        if cell._last_division >= cd:
+            cell.divide(patches[x_r][y_r])
+            global total_cells
+            total_cells += 1
+            global current_cells
+            current_cells += 1
+            global div_list
+            div_list.append(cell.divisions())
 
 def initial_pop(row:int,col:int,intial_population:int,grid):
     init_pop = initial_population * [1] + (row * col - initial_population)*[0]
@@ -146,7 +137,7 @@ if __name__ == '__main__':
     current_cells += initial_population
     age_limit = 10
     division_limit = 7
-    division_prob = 0.9
+    division_prob = 0.6
     division_cd = 1
     time_limit = 100
     tick = 0

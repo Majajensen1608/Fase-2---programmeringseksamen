@@ -1,8 +1,6 @@
                   
 import sys
-import time
-from collections import namedtuple
-from msilib.schema import SelfReg
+
 
 def start_menu():
     ''' Prints a menu for the user'''

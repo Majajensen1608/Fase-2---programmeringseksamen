@@ -108,3 +108,4 @@ def start_of_program():
         except ValueError:
             print('Please enter a valid option')
         
+start_of_program()

@@ -10,34 +10,26 @@ from operator import itemgetter
 import matplotlib.pyplot as plt
 
 
-
 age_deaths = 0
 division_deaths = 0
 poison_deaths = 0
 total_cells = 0
-div_list = []
-current_cells = 0
-
 
 def cell_life(cell:Cell,age_limit,division_limit):
     '''Uses tick function to age cells. if the age_limit or division_limit is exceeded, the cell will die.'''
     cell.tick()
-    global current_cells
     if cell.age() > age_limit:
         cell.died_by_age_limit()
         global age_deaths
         age_deaths += 1
-        current_cells -= 1
     elif cell.divisions() >= division_limit:
         cell.died_by_division_limit()
         global division_deaths
         division_deaths += 1
-        current_cells -= 1
     elif cell.patch().toxicity() - cell.resistance() >= random.randint(0,10):
         cell.died_by_poisoning()
         global poison_deaths
         poison_deaths += 1
-        current_cells -= 1
 
 def check_for_cells(patch_list):
     '''Iterates over the entire patch list for cells. Returns true if there is a cell on the patch.'''
@@ -87,10 +79,6 @@ def spread_cells(patches,patch,row,col,divisions_probability,cd):
             cell.divide(patches[x_r][y_r])
             global total_cells
             total_cells += 1
-            global current_cells
-            current_cells += 1
-            global div_list
-            div_list.append(cell.divisions())
 
 def initial_pop(row:int,col:int,intial_population:int,grid):
     init_pop = initial_population * [1] + (row * col - initial_population)*[0]
@@ -104,6 +92,8 @@ def initial_pop(row:int,col:int,intial_population:int,grid):
     return board, cellpatches
 
 def find_max(this_list):
+    '''Finds the index of the item with the highest count.
+        Used to find generation with most cells.'''
     counter = 0
     if len(this_list) != 0:
         this_max = this_list[0]
@@ -115,26 +105,12 @@ def find_max(this_list):
                 this_max = i        
         return this_max
 
-def find_min(this_list):
-    counter = 0
-    if len(this_list) != 0:
-        this_min = this_list[0]
-
-        for i in this_list:
-            current = this_list.count(i)
-            if current < counter:
-                counter = current
-                this_min = i        
-        return this_min
-
-
 
 if __name__ == '__main__':
     grid = np.genfromtxt('grid_3.txt', dtype='str')
     row = len(grid)
     col = len(grid[0])
     initial_population = 2
-    current_cells += initial_population
     age_limit = 10
     division_limit = 7
     division_prob = 0.6
@@ -143,15 +119,12 @@ if __name__ == '__main__':
     tick = 0
     total_gens = 0
     gen_list = []
-    res_list = []
     gen_res_list = []
     cell_list = []
-    current_list = []
     init_pop,cell_patches = initial_pop(row,col,initial_population,grid)
     vis = Visualiser(init_pop,row,col)
     
     while check_for_cells(cell_patches) and tick<time_limit:
-        current_list.append(current_cells)
         for patch in cell_patches:
             if patch.has_cell():
                 cell = patch.cell()
@@ -176,40 +149,36 @@ if __name__ == '__main__':
 
     vis.close()
 
-    sorted_by_gen = sorted(gen_res_list,key=itemgetter(0))
 
+    #Sort gen_res list by generation
+    sorted_by_gen = sorted(gen_res_list,key=itemgetter(0))
     cell_gen = []
     cell_res = []
-
     if len(sorted_by_gen) != 0:
-        cell_gen, cell_res = zip(*sorted_by_gen)
+        cell_gen, cell_res = zip(*sorted_by_gen)#create two lists from sorted
 
+    #Create list with number of cells in each generation in sorted order
     gen_counted = []
     gen_spread = []
-
     for i in cell_gen:
         if i not in gen_counted:
             gen_spread.append(cell_gen.count(i))
             gen_counted.append(i)
-
-    if len(gen_spread) != 0:
-        max_value = max(gen_spread)
-
+    
     highest_gen = find_max(gen_list)
             
     total_deaths = age_deaths + division_deaths + poison_deaths
 
 
-    #Avg res test
-    '''
+    #Avg resistance total
+    avg_res_total = 0
     if len(gen_res_list)!=0:
         res_sum = 0
         for cells in gen_res_list:
             cell_res = cells[1]
             res_sum += cell_res
-        avg_test = res_sum/len(gen_res_list)
-        print("Test avg", round(avg_test,2))
-    '''
+        avg_res_total = res_sum/len(gen_res_list)
+    
     
     print("")
     print("--- SIM STATS ---")
@@ -219,6 +188,8 @@ if __name__ == '__main__':
     print("Number of generations:", total_gens)
     print("")
     print("Generation with most cells:", highest_gen)
+    print("")
+    print("Average resistance of all cells:",round(avg_res_total,2))
     print("")
     print("Total number of cells:", total_cells + initial_population)
     print("")
@@ -231,13 +202,13 @@ if __name__ == '__main__':
     print("Total deaths:", total_deaths)
     print("")
 
+
+    #Find the max, min and avg res for each gen and add to lists for graphs
     cell_res_max = []
     cell_res_min = []
     cell_res_avg = []
-    res_counter = []
-    
+    res_counter = []   
     current_check = 0
-
     for cell in sorted_by_gen:
         if cell[0] != current_check or cell[0] == len(sorted_by_gen)-1:
             current_check += 1

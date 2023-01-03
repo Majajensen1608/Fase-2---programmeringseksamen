@@ -220,7 +220,6 @@ def main():
         print("")
         print("Oh no, the cells died to poisoning before they could spread properly!")
         print("Please run again.")
-        print("")
         con.start_of_program()
     else:
         print("")

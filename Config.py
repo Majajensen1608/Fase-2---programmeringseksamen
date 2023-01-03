@@ -1,23 +1,24 @@
 import sys
-import model
-import cell_sim
+import cell_sim as cel
 
 
 ''' Declaring values for non user determined variables'''
 age_limit = 10
-division_limit = 2
+division_limit = 7
 division_prob = 0.6
-division_cd = 2
+division_cd = 1
 
 '''Declaring variables we use as default to later adjust from user inputs '''
 default_time_limit = 1000
 current_time_limit = default_time_limit
 
-# default_chosen_grid = indsættes her
-# current_chosen_grid = default_chosen_grid
+default_chosen_grid = "grid_1.txt"
+current_chosen_grid = default_chosen_grid
 
 default_initial_population = 2
 current_initial_population = default_initial_population
+
+
 
 def start_menu():
     ''' Prints a menu for the user'''
@@ -32,7 +33,7 @@ def start_menu():
 def option_one(): 
     ''' Displays the current configurations of the simulation - for all variables'''
     print('Displaying configuration...')
-    print ('Chosen grid option:\t\t') #Skal indsættes her, når det virker  
+    print ('Chosen grid option:\t', current_chosen_grid)  
     print('Initial population:\t', current_initial_population)
     print ('Age limit:\t\t', age_limit)
     print ('Division limit:\t\t', division_limit)
@@ -45,6 +46,8 @@ def option_reset_to_default():
     ''' Resets the user determined variables to their default value '''
     global current_initial_population
     current_initial_population = default_initial_population
+    global current_chosen_grid
+    current_chosen_grid = default_chosen_grid
     global current_time_limit
     current_time_limit = default_time_limit
 
@@ -84,21 +87,25 @@ def option_choose_grid():
             [2] GRID 2 - dimensions: 12 x 17
             [3] GRID 3 - dimensions: 9 x 16  ''')
 
-    selection = input('Please choose a grid option')
-while True:
-    selection = input('Please choose a grid option')
-    try:
-        ans = int(selection)
-        if ans == 1:
-            print('Hvordan?')
-        if ans == 2:
-            print(' :( ')
-        if ans == 3:
-            print(' øv ')
-        else:
-            print('Insert a valid option from the list!')
-    except ValueError:
-        print('Insert enter a valid option')
+
+    while True:
+        selection = input('Please choose a grid option: ')
+        global current_chosen_grid
+        try:
+            ans = int(selection)
+            if ans == 1:
+                current_chosen_grid = "grid_1.txt"
+                break
+            if ans == 2:
+                current_chosen_grid = "grid_2.txt"
+                break
+            if ans == 3:
+                current_chosen_grid = "grid_3.txt"
+                break
+            else:
+                print('Insert a valid option from the list!')
+        except ValueError:
+            print('Insert enter a valid option')
    
 
 
@@ -116,7 +123,7 @@ def start_of_program():
             
             elif ans == 2:
                 option_setup_pop_time()
-                option_choose_grid() #virker ikke 
+                option_choose_grid()
                 start_of_program()
                 break
 
@@ -127,7 +134,7 @@ def start_of_program():
                 break           
             
             elif ans == 4:
-                cell.main() #OBS! Skal måske ændres
+                cel.main()
                 break
             
             elif ans == 5:

@@ -117,6 +117,20 @@ def option_choose_grid():
         except ValueError:
             print('Invalid input, please enter a valid option.')
 
+def check_grid_dimensions(filename):
+    grid = np.genfromtxt(filename, dtype='str')
+    rows = len(grid)
+    cols = len(grid[0])
+    if rows >= 3 and cols >= 3:
+        return True
+    else:
+        return False
+
+# Check the dimensions of grid1.txt
+if check_grid_dimensions('grid_1.txt'):
+    print('grid_1.txt has at least 3 rows and 3 columns')
+else:
+    print('grid_1.txt does not have at least 3 rows and 3 columns')
 
 def start_of_program():
     ''' Prints the start menu and takes in the user's input to call the desired function '''
@@ -143,6 +157,9 @@ def start_of_program():
                 break           
             
             elif ans == 4:
+                if not check_grid_dimensions(current_chosen_grid):
+                    print('Error: chosen grid does not have at least 3 rows and 3 columns')
+                    break
                 cel.main()
                 break
             

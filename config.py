@@ -92,33 +92,25 @@ def option_choose_grid():
     grid = np.genfromtxt(current_chosen_grid, dtype='str')
     row = len(grid)
     col = len(grid[0])
-    ''' lets the user choose one of the three pre-determined options for the grid'''
-    print('''GRID OPTIONS:
-            [1] GRID 1 - dimensions: 11 x 19
-            [2] GRID 2 - dimensions: 12 x 17
-            [3] GRID 3 - dimensions: 9 x 16  ''')
-
-
-    while True:
-        selection = input('Please choose a grid option: ')
+    while row < 3 or col < 3:
+        with open("grid_err.txt", "r") as f:
+            grid_err_msg = f.read()
+        print(grid_err_msg)
+        selection = input('Please choose a different grid option: ')
         try:
             ans = int(selection)
             if ans == 1:
                 current_chosen_grid = "grid_1.txt"
-                break
             elif ans == 2:
                 current_chosen_grid = "grid_2.txt"
-                break
             elif ans == 3:
                 current_chosen_grid = "grid_3.txt"
-                break
-            else:
-                print('Invalid selection. Please choose a number from 1 to 3.')
+            grid = np.genfromtxt(current_chosen_grid, dtype='str')
+            row = len(grid)
+            col = len(grid[0])
         except ValueError:
-            print('Invalid input. Please enter a number from 1 to 3.')
-
-    if row < 3 or col < 3:
-        print("Error: grid must have at least 3 rows and 3 columns.")
+            print('Please choose a valid grid option.')
+    # rest of the function goes here
    
 
 

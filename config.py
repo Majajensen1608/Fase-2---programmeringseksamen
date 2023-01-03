@@ -1,6 +1,6 @@
 import sys
 import cell_sim as cel
-
+import numpy as np
 
 ''' Declaring values for non user determined variables'''
 age_limit = 10
@@ -88,6 +88,10 @@ def option_setup_pop_time():
     
 
 def option_choose_grid():
+    global current_chosen_grid
+    grid = np.genfromtxt(current_chosen_grid, dtype='str')
+    row = len(grid)
+    col = len(grid[0])
     ''' lets the user choose one of the three pre-determined options for the grid'''
     print('''GRID OPTIONS:
             [1] GRID 1 - dimensions: 11 x 19
@@ -97,22 +101,24 @@ def option_choose_grid():
 
     while True:
         selection = input('Please choose a grid option: ')
-        global current_chosen_grid
         try:
             ans = int(selection)
             if ans == 1:
                 current_chosen_grid = "grid_1.txt"
                 break
-            if ans == 2:
+            elif ans == 2:
                 current_chosen_grid = "grid_2.txt"
                 break
-            if ans == 3:
+            elif ans == 3:
                 current_chosen_grid = "grid_3.txt"
                 break
             else:
-                print('Insert a valid option from the list!')
+                print('Invalid selection. Please choose a number from 1 to 3.')
         except ValueError:
-            print('Insert enter a valid option')
+            print('Invalid input. Please enter a number from 1 to 3.')
+
+    if row < 3 or col < 3:
+        print("Error: grid must have at least 3 rows and 3 columns.")
    
 
 

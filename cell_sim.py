@@ -2,6 +2,7 @@ from visualiser import Visualiser
 from model import CellPatch
 from model import ObstaclePatch
 from model import Cell
+import config as con
 import random
 from random import shuffle, choices, choice
 import numpy as np
@@ -80,7 +81,7 @@ def spread_cells(patches,patch,row,col,divisions_probability,cd):
             global total_cells
             total_cells += 1
 
-def initial_pop(row:int,col:int,intial_population:int,grid):
+def initial_pop(row:int,col:int,initial_population:int,grid):
     init_pop = initial_population * [1] + (row * col - initial_population)*[0]
     shuffle(init_pop)
     board = create_board(row,col,grid)
@@ -105,17 +106,40 @@ def find_max(this_list):
                 this_max = i        
         return this_max
 
+def plot_graphs(gen_spread,cell_res_max,cell_res_min,cell_res_avg):
+    #Plot generation spread
+    gen_x = list(range(0,len(gen_spread)))
+    gen_y = gen_spread
+    if len(gen_y) == len(gen_x):
+        plt.plot(gen_x,gen_y)
+        plt.title("Cell generations over time")
+        plt.xlabel("Generations")
+        plt.ylabel("Number of cells")
+        plt.show()
+ 
 
-if __name__ == '__main__':
-    grid = np.genfromtxt('grid_3.txt', dtype='str')
+    #Plot resistance over generations
+    res_x = list(range(0,len(cell_res_max)))
+    plt.plot(res_x, cell_res_max, label = "Max Res")
+    plt.plot(res_x, cell_res_avg, label = "Avg Res", linestyle = ":")
+    plt.plot(res_x, cell_res_min, label = "Min Res", linestyle = "--")
+    plt.title("Cell resistance over generations")
+    plt.xlabel("Generations")
+    plt.ylabel("Resistance")
+    plt.legend()
+    plt.show()
+
+
+def main():
+    grid = np.genfromtxt(con.current_chosen_grid, dtype='str')
     row = len(grid)
     col = len(grid[0])
-    initial_population = 2
-    age_limit = 10
-    division_limit = 7
-    division_prob = 0.6
-    division_cd = 1
-    time_limit = 100
+    initial_population = con.current_initial_population
+    age_limit = con.age_limit
+    division_limit = con.division_limit
+    division_prob = con.division_prob
+    division_cd = con.division_cd
+    time_limit = con.current_time_limit
     tick = 0
     total_gens = 0
     gen_res_list = []
@@ -144,7 +168,7 @@ if __name__ == '__main__':
         
         vis.update()
         tick += 1
-
+    
     vis.close()
 
 
@@ -165,30 +189,6 @@ if __name__ == '__main__':
         total_res_mean = 0
 
     total_deaths = age_deaths + division_deaths + poison_deaths
-
-    
-    print("")
-    print("--- SIM STATS ---")
-    print("")
-    print("Time in ticks:", tick)
-    print("")
-    print("Number of generations:", total_gens)
-    print("")
-    print("Generation with most cells:", highest_gen)
-    print("")
-    print("Average resistance of all cells:",total_res_mean)
-    print("")
-    print("Total number of cells:", total_cells + initial_population)
-    print("")
-    print("Deaths by age:", age_deaths)
-    print("")
-    print("Deaths by division:", division_deaths)
-    print("")
-    print("Deaths by poisoning:", poison_deaths)
-    print("")
-    print("Total deaths:", total_deaths)
-    print("")
-
 
     #Create list with number of cells in each generation in sorted order
     gen_counted = []
@@ -215,25 +215,36 @@ if __name__ == '__main__':
         
         res_counter.append(cell[1])
 
-    #Plot generation spread
-    gen_x = list(range(0,len(gen_spread)))
-    gen_y = gen_spread
-    if len(gen_y) == len(gen_x):
-        plt.plot(gen_x,gen_y)
-        plt.title("Cell generations over time")
-        plt.xlabel("Generations")
-        plt.ylabel("Number of cells")
-        plt.show()
- 
 
-    #Plot resistance over generations
-    res_x = list(range(0,len(cell_res_max)))
-    plt.plot(res_x, cell_res_max, label = "Max Res")
-    plt.plot(res_x, cell_res_avg, label = "Avg Res", linestyle = ":")
-    plt.plot(res_x, cell_res_min, label = "Min Res", linestyle = "--")
-    plt.title("Cell resistance over generations")
-    plt.xlabel("Generations")
-    plt.ylabel("Resistance")
-    plt.legend()
-    plt.show()
+    if tick < time_limit:
+        print("")
+        print("Oh no, the cells died to poisoning before they could spread properly!")
+        print("Please run again.")
+        print("")
+        con.start_of_program()
+    else:
+        print("")
+        print("Calculating simulation...")
+        print("")
+        print("--- SIM STATS ---")
+        print("")
+        print("Time in ticks:", tick)
+        print("")
+        print("Number of generations:", total_gens)
+        print("")
+        print("Generation with most cells:", highest_gen)
+        print("")
+        print("Average resistance of all cells:",total_res_mean)
+        print("")
+        print("Total number of cells:", total_cells + initial_population)
+        print("")
+        print("Deaths by age:", age_deaths)
+        print("")
+        print("Deaths by division:", division_deaths)
+        print("")
+        print("Deaths by poisoning:", poison_deaths)
+        print("")
+        print("Total deaths:", total_deaths)
+        print("")
+        plot_graphs(gen_spread,cell_res_max,cell_res_min,cell_res_avg)
  

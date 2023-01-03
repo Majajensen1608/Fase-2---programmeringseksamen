@@ -89,14 +89,13 @@ def option_setup_pop_time():
 
 def option_choose_grid():
     global current_chosen_grid
-    grid = np.genfromtxt(current_chosen_grid, dtype='str')
-    row = len(grid)
-    col = len(grid[0])
-    while row < 3 or col < 3:
-        with open("grid_err.txt", "r") as f:
-            grid_err_msg = f.read()
-        print(grid_err_msg)
-        selection = input('Please choose a different grid option: ')
+    while True:
+        print("Please choose a grid option:")
+        print("[1] grid_1.txt")
+        print("[2] grid_2.txt")
+        print("[3] grid_3.txt")
+        # Add more options here if necessary
+        selection = input('Enter your selection: ')
         try:
             ans = int(selection)
             if ans == 1:
@@ -105,13 +104,18 @@ def option_choose_grid():
                 current_chosen_grid = "grid_2.txt"
             elif ans == 3:
                 current_chosen_grid = "grid_3.txt"
+            # Add more options here if necessary
             grid = np.genfromtxt(current_chosen_grid, dtype='str')
             row = len(grid)
             col = len(grid[0])
+            if row < 3 or col < 3:
+                with open("grid_err.txt", "r") as f:
+                    grid_err_msg = f.read()
+                print(grid_err_msg)
+            else:
+                break
         except ValueError:
-            print('Please choose a valid grid option.')
-    # rest of the function goes here
-   
+            print('Invalid input, please enter a valid option.')
 
 
 def start_of_program():

@@ -22,6 +22,7 @@ current_initial_population = default_initial_population
 
 def start_menu():
     ''' Prints a menu for the user'''
+    print("")
     print('*******MAIN MENU - CELLULAR AUTOMATA 2.0******')
     print('''Please select one of the following options:  
     [1] Display configuration
@@ -32,7 +33,9 @@ def start_menu():
 
 def option_one(): 
     ''' Displays the current configurations of the simulation - for all variables'''
+    print("")
     print('Displaying configuration...')
+    print("")
     print ('Chosen grid option:\t', current_chosen_grid)  
     print('Initial population:\t', current_initial_population)
     print ('Age limit:\t\t', age_limit)
@@ -40,6 +43,7 @@ def option_one():
     print('Division probability:\t', division_prob)
     print ('Division cooldown:\t', division_cd)
     print ('Time limit\t\t', current_time_limit)
+    print("")
 
 
 def option_reset_to_default():
@@ -54,30 +58,33 @@ def option_reset_to_default():
 def option_setup_pop_time():
     '''Lets the user determine the initial population and time limit (in ticks)'''
     while True: 
-        value_ip = input('Insert the initial population size: ')
+        value_ip = input('Insert the initial population size from 1 to 5: ')
         try:
             my_value_pop_size = int(value_ip)
-            if my_value_pop_size >= 1:
+            if my_value_pop_size >= 1 and my_value_pop_size <= 5:
                 global current_initial_population 
                 current_initial_population = my_value_pop_size
                 break
             
             else:
-                print ('The initial population size must be larger than 0, try again! ')
+                print ('The initial population size must an integer from 1 to 5, try again! ')
 
         except ValueError:
-            print ('The initial population size must be an integer larger than 0, try again!')
+            print ('The initial population size must an integer from 1 to 5, try again! ')
    
     while True:
-        value_tl = input('Insert time limit: ')
+        value_tl = input('Insert time limit from 10 to 1000: ')
         try:
             my_value_tl = int(value_tl)
-            if my_value_tl >= 1:
+            if my_value_tl >= 10 and my_value_tl <= 1000:
                 global current_time_limit
                 current_time_limit = my_value_tl
                 break
+            else:
+                print('The time limit must be an integer from 10 to 1000, try again!')
+                
         except ValueError:
-            print('The time limit must be an integer larger than 0, try again!')
+            print('The time limit must be an integer from 10 to 1000, try again!')
     
 
 def option_choose_grid():
